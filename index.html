@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Picture Matching Game</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<main class="wrap">
+
+  <section id="start-screen" class="screen">
+    <h1>🧠 Picture Matching Game</h1>
+
+    <div class="option-group">
+      <h2>How many pairs?</h2>
+      <div class="btn-row">
+        <button class="difficulty-btn selected" data-pairs="8">8 pairs</button>
+        <button class="difficulty-btn" data-pairs="16">16 pairs</button>
+        <button class="difficulty-btn" data-pairs="32">32 pairs</button>
+      </div>
+    </div>
+
+    <div class="option-group">
+      <h2>Card pictures</h2>
+      <div class="btn-row">
+        <button class="source-btn selected" data-source="emoji">😀 Emoji</button>
+        <button class="source-btn" data-source="drive">📷 My Photos (Google Drive)</button>
+      </div>
+      <p id="drive-status" class="hint"></p>
+    </div>
+
+    <button id="start-btn" class="primary-btn">Start Game</button>
+  </section>
+
+  <section id="game-screen" class="screen hidden">
+    <div class="stats-bar">
+      <span>Moves: <strong id="moves">0</strong></span>
+      <span>Time: <strong id="timer">0:00</strong></span>
+      <span>Pairs left: <strong id="pairs-left">0</strong></span>
+      <div class="stats-actions">
+        <button id="restart-btn">Restart</button>
+        <button id="change-settings-btn">Menu</button>
+      </div>
+    </div>
+
+    <div id="board" class="board"></div>
+  </section>
+
+  <div id="win-overlay" class="overlay hidden">
+    <div class="overlay-card">
+      <h2>🎉 You matched them all!</h2>
+      <p id="win-stats"></p>
+      <div class="btn-row">
+        <button id="play-again-btn" class="primary-btn">Play Again</button>
+        <button id="back-to-menu-btn">Menu</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="js/config.js"></script>
+<script src="js/drive.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>
