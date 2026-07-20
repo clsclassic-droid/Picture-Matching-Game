@@ -138,6 +138,10 @@ button:active { transform: scale(0.97); }
   backface-visibility: hidden;
   font-size: clamp(1.2rem, 4vw, 2.2rem);
   overflow: hidden;
+  /* Force a color-emoji font so pictures render properly instead of
+     falling back to monochrome glyphs (notably Segoe UI Symbol on Windows). */
+  font-family: "Segoe UI Emoji", "Noto Color Emoji", "Apple Color Emoji",
+    "Segoe UI Symbol", sans-serif;
 }
 
 .card-back {
