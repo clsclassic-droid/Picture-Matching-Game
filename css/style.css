@@ -1,10 +1,13 @@
 :root {
-  --bg: #101425;
-  --surface: #1b2140;
-  --accent: #6c8cff;
-  --accent-2: #ff7ac6;
-  --text: #eef0ff;
-  --muted: #93a0c9;
+  --ink: #17130f;
+  --paper: #fff3d6;
+  --paper-2: #ffe6ac;
+  --blue: #2b6cb8;
+  --blue-deep: #194a87;
+  --red: #e63946;
+  --gold: #ffc845;
+  --pink: #ff4fa0;
+  --bg-deep: #140f30;
   color-scheme: dark;
 }
 
@@ -13,107 +16,424 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background: radial-gradient(circle at top, #1a2150 0%, var(--bg) 60%);
-  color: var(--text);
-  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  background: var(--bg-deep);
+  color: var(--ink);
+  font-family: Verdana, "Segoe UI", system-ui, sans-serif;
   display: flex;
   justify-content: center;
-  padding: 24px 12px;
+  padding: 40px 16px 64px;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* halftone dot backdrop, like cheap offset-print paper under UV */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255, 200, 69, 0.1) 0, transparent 55%),
+    radial-gradient(circle at 85% 75%, rgba(255, 79, 160, 0.12) 0, transparent 55%),
+    repeating-radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.06) 0 1.4px, transparent 1.4px 16px);
+  background-size: auto, auto, 16px 16px;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .wrap {
+  position: relative;
+  z-index: 1;
   width: 100%;
-  max-width: 900px;
+  max-width: 780px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
 }
 
 .hidden { display: none !important; }
 
-h1 {
+/* ---------- hand-inked border overlay ----------
+   Used on chrome/UI (panels, buttons, badges) — NOT on the flipping
+   card faces, since SVG filters combined with a 3D flip transform +
+   backface-visibility:hidden can misrender on some browsers. A plain
+   solid border on the cards avoids that risk. */
+.ink {
+  position: relative;
+  border: none !important;
+}
+
+.ink::before,
+.ink::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-style: solid;
+  border-color: var(--ink);
+  border-width: var(--ink-w, 4px);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.ink::before {
+  filter: url(#roughen-a);
+  opacity: 0.9;
+}
+
+.ink::after {
+  filter: url(#roughen-b);
+  transform: rotate(0.4deg) scale(1.008);
+  opacity: 0.55;
+}
+
+/* ---------- masthead ---------- */
+.masthead {
+  position: relative;
   text-align: center;
-  font-size: clamp(1.5rem, 5vw, 2.2rem);
-  margin: 0;
-  flex: 1;
+  padding: 46px 10px 6px;
+  isolation: isolate;
 }
 
-.title-row {
+.starburst {
+  position: absolute;
+  inset: -40px -10px auto -10px;
+  height: 320px;
+  z-index: -1;
+  background: repeating-conic-gradient(from 0deg, var(--gold) 0deg 8deg, var(--paper-2) 8deg 16deg);
+  -webkit-mask-image: radial-gradient(circle, black 42%, transparent 70%);
+  mask-image: radial-gradient(circle, black 42%, transparent 70%);
+  opacity: 0.9;
+}
+
+.eyebrow {
+  --ink-w: 3px;
+  display: inline-block;
+  background: var(--red);
+  color: var(--paper);
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  padding: 6px 16px;
+  border-radius: 999px;
+  transform: rotate(-3deg);
+  box-shadow: 4px 4px 0 var(--ink);
+}
+
+.title {
+  margin: 18px 0 0;
+  font-family: Impact, "Arial Narrow Bold", "Franklin Gothic Bold", sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  line-height: 0.92;
+  font-size: clamp(2.4rem, 8vw, 4rem);
+  letter-spacing: 0.01em;
+  color: var(--paper);
+  -webkit-text-stroke: 3px var(--ink);
+  text-shadow: 4px 0 0 var(--red), -4px 0 0 var(--blue), 8px 8px 0 var(--ink);
+  text-wrap: balance;
+  transform: rotate(-1.2deg);
+}
+
+.title .pop {
+  display: block;
+  color: var(--gold);
+  -webkit-text-stroke: 3px var(--ink);
+  text-shadow: 4px 0 0 var(--pink), -4px 0 0 var(--blue), 8px 8px 0 var(--ink);
+}
+
+/* ---------- shared panel language ---------- */
+.panel {
+  --ink-w: 4px;
+  background: var(--paper);
+  border-radius: 4px 22px 6px 20px;
+  box-shadow: 7px 7px 0 var(--ink);
+  padding: 22px clamp(16px, 4vw, 30px) 26px;
+}
+
+.panel-pairs { transform: rotate(-1.3deg); }
+.panel-players { transform: rotate(0.8deg); }
+.panel-source { transform: rotate(-0.6deg); }
+
+.panel-label {
+  display: inline-block;
+  background: var(--ink);
+  color: var(--paper);
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  padding: 5px 12px 6px;
+  border-radius: 3px;
+  transform: rotate(-2deg);
+  margin: -40px 0 16px -6px;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.35);
+}
+
+.screen { display: flex; flex-direction: column; gap: 28px; }
+
+/* ---------- pairs badges ---------- */
+.badge-row,
+.player-toggle-row {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 24px;
-}
-
-.screen {
-  background: var(--surface);
-  border-radius: 16px;
-  padding: clamp(16px, 4vw, 32px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-}
-
-.option-group { margin-bottom: 24px; }
-.option-group h2 { font-size: 1rem; color: var(--muted); margin: 0 0 10px; }
-
-.btn-row {
-  display: flex;
+  gap: clamp(10px, 3vw, 22px);
+  justify-content: center;
   flex-wrap: wrap;
-  gap: 10px;
+  padding-top: 4px;
 }
+
+.badge {
+  --ink-w: 4px;
+  font-family: Verdana, sans-serif;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: var(--paper-2);
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 5px 5px 0 var(--ink);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.badge:nth-child(1) { transform: rotate(-6deg); }
+.badge:nth-child(2) { transform: rotate(3deg); }
+.badge:nth-child(3) { transform: rotate(-2deg); }
+.badge:hover { transform: translateY(-4px) rotate(0deg); box-shadow: 7px 9px 0 var(--ink); }
+
+.badge .num {
+  font-family: Impact, "Arial Narrow Bold", sans-serif;
+  font-size: 1.9rem;
+  line-height: 1;
+}
+
+.badge .lbl {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin-top: 2px;
+}
+
+.badge.selected {
+  background: var(--red);
+  color: var(--paper);
+}
+
+/* ---------- player-count badges ---------- */
+.player-toggle {
+  --ink-w: 3px;
+  font-family: Verdana, sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--ink);
+  background: var(--paper-2);
+  border-radius: 14px;
+  padding: 14px 24px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  box-shadow: 5px 5px 0 var(--ink);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.player-toggle svg { width: 38px; height: 38px; }
+.player-toggle:nth-child(1) { transform: rotate(-3deg); }
+.player-toggle:nth-child(2) { transform: rotate(2.5deg); }
+.player-toggle:hover { transform: translateY(-4px); box-shadow: 7px 9px 0 var(--ink); }
+
+.player-toggle.selected {
+  background: var(--pink);
+  color: var(--paper);
+}
+
+/* ---------- source tabs ---------- */
+.tab-row {
+  display: flex;
+  gap: clamp(10px, 3vw, 18px);
+  flex-wrap: wrap;
+}
+
+.tab {
+  --ink-w: 3px;
+  flex: 1 1 140px;
+  background: var(--paper-2);
+  color: var(--ink);
+  border-radius: 10px;
+  padding: 14px 10px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 var(--ink);
+  transition: transform 0.15s ease;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.tab:hover { transform: translateY(-3px); }
+.tab.selected { background: var(--blue); color: var(--paper); }
+.tab svg { width: 34px; height: 34px; }
+
+.hint { color: var(--paper); font-size: 0.85rem; min-height: 1.2em; margin-top: 10px; font-weight: 700; }
+
+/* ---------- CTA & plain buttons ---------- */
+.cta {
+  --ink-w: 4px;
+  font-family: Impact, "Arial Narrow Bold", sans-serif;
+  font-size: 1.5rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--gold);
+  border-radius: 12px;
+  padding: 16px 32px;
+  cursor: pointer;
+  box-shadow: 8px 8px 0 var(--ink);
+  transform: rotate(-1deg);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  width: 100%;
+}
+
+.cta:hover { transform: translate(-2px, -4px) rotate(-1deg); box-shadow: 10px 12px 0 var(--ink); }
+.cta:active { transform: translate(4px, 4px) rotate(-1deg); box-shadow: 3px 3px 0 var(--ink); }
 
 button {
   font: inherit;
   cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text);
-  border-radius: 10px;
-  padding: 10px 16px;
-  transition: transform 0.1s ease, background 0.2s ease, border-color 0.2s ease;
 }
 
-button:hover { background: rgba(255, 255, 255, 0.1); }
-button:active { transform: scale(0.97); }
-
-.difficulty-btn.selected,
-.source-btn.selected {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #0a0d1a;
-  font-weight: 600;
-}
-
-.primary-btn {
-  width: 100%;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  border: none;
-  color: #0a0d1a;
+#restart-btn,
+#change-settings-btn,
+#back-to-menu-btn {
+  --ink-w: 3px;
+  background: var(--paper-2);
+  color: var(--ink);
   font-weight: 700;
-  font-size: 1.05rem;
-  padding: 14px;
+  border-radius: 8px;
+  padding: 8px 14px;
+  box-shadow: 3px 3px 0 var(--ink);
 }
 
-.hint { color: var(--muted); font-size: 0.9rem; min-height: 1.2em; margin-top: 8px; }
+.mute-btn {
+  --ink-w: 3px;
+  background: var(--paper-2);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 1.1rem;
+  line-height: 1;
+  box-shadow: 3px 3px 0 var(--ink);
+}
 
+/* ---------- stats bar ---------- */
 .stats-bar {
+  --ink-w: 3px;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 16px;
-  background: var(--surface);
-  border-radius: 12px;
+  gap: 14px;
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 10px;
   padding: 12px 16px;
-  margin-bottom: 16px;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  font-weight: 700;
 }
 
+.stat strong { font-family: Impact, sans-serif; font-size: 1.1rem; }
 .stats-actions { margin-left: auto; display: flex; gap: 8px; }
 
-.mute-btn {
-  padding: 10px 14px;
-  font-size: 1.1rem;
-  line-height: 1;
+/* ---------- two-player scoreboard ---------- */
+.scoreboard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(8px, 3vw, 18px);
+  flex-wrap: wrap;
+  padding: 6px 0;
 }
 
+.player-card {
+  --ink-w: 3px;
+  position: relative;
+  min-width: 130px;
+  text-align: center;
+  border-radius: 10px 18px 10px 18px;
+  padding: 16px 20px 14px;
+  box-shadow: 4px 4px 0 var(--ink);
+  color: var(--paper);
+}
+
+.player-card.p1 { background: var(--blue); transform: rotate(-2.5deg); }
+.player-card.p2 { background: var(--pink); transform: rotate(2deg); }
+.player-card.active { animation: turnPulse 1.4s ease-in-out infinite; }
+
+@keyframes turnPulse {
+  0%, 100% { box-shadow: 4px 4px 0 var(--ink); }
+  50% { box-shadow: 4px 4px 0 var(--ink), 0 0 24px 6px var(--gold); }
+}
+
+.turn-flag {
+  --ink-w: 0;
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-4deg);
+  background: var(--gold);
+  color: var(--ink);
+  font-family: Impact, sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  padding: 4px 10px 3px;
+  border-radius: 6px;
+  box-shadow: 2px 2px 0 var(--ink);
+  white-space: nowrap;
+}
+
+.player-name {
+  font-family: Impact, "Arial Narrow Bold", sans-serif;
+  font-size: 1.05rem;
+  letter-spacing: 0.05em;
+}
+
+.player-score {
+  font-family: Impact, "Arial Narrow Bold", sans-serif;
+  font-size: 2.3rem;
+  line-height: 1.05;
+  margin-top: 2px;
+}
+
+.player-score-lbl {
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  opacity: 0.85;
+}
+
+.vs-burst {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  font-family: Impact, "Arial Narrow Bold", sans-serif;
+  font-style: italic;
+  color: var(--paper);
+  font-size: 2.2rem;
+  line-height: 1;
+  transform: rotate(-10deg) skewX(-8deg);
+  filter: url(#roughen-a) drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.4));
+}
+
+/* ---------- board & cards ----------
+   Solid borders (not the wobbly .ink treatment) — kept plain on purpose,
+   see the .ink comment above. */
 .board {
   --cols: 4;
+  position: relative;
   display: grid;
   grid-template-columns: repeat(var(--cols), 1fr);
   gap: clamp(6px, 1.5vw, 12px);
@@ -145,8 +465,8 @@ button:active { transform: scale(0.97); }
 }
 
 .card.matched .card-front {
-  border-color: var(--accent-2);
-  box-shadow: 0 0 0 2px var(--accent-2);
+  border-color: var(--gold);
+  box-shadow: 5px 5px 0 var(--ink), 0 0 0 2px var(--gold);
   animation: cardMatchGlow 0.6s ease;
 }
 
@@ -159,9 +479,9 @@ button:active { transform: scale(0.97); }
 }
 
 @keyframes cardMatchGlow {
-  0% { box-shadow: 0 0 0 2px var(--accent-2); }
-  40% { box-shadow: 0 0 22px 6px var(--accent-2); }
-  100% { box-shadow: 0 0 0 2px var(--accent-2); }
+  0% { box-shadow: 5px 5px 0 var(--ink), 0 0 0 2px var(--gold); }
+  40% { box-shadow: 5px 5px 0 var(--ink), 0 0 22px 6px var(--gold); }
+  100% { box-shadow: 5px 5px 0 var(--ink), 0 0 0 2px var(--gold); }
 }
 
 .card-face {
@@ -172,33 +492,52 @@ button:active { transform: scale(0.97); }
   justify-content: center;
   border-radius: 10px;
   backface-visibility: hidden;
-  font-size: clamp(1.2rem, 4vw, 2.2rem);
   overflow: hidden;
-  /* Force a color-emoji font so pictures render properly instead of
-     falling back to monochrome glyphs (notably Segoe UI Symbol on Windows). */
-  font-family: "Segoe UI Emoji", "Noto Color Emoji", "Apple Color Emoji",
-    "Segoe UI Symbol", sans-serif;
+  border: 3px solid var(--ink);
+  box-shadow: 4px 4px 0 var(--ink);
 }
 
 .card-back {
-  background: linear-gradient(135deg, #2a3060, #1b2140);
-  color: var(--muted);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: repeating-linear-gradient(45deg, var(--blue-deep) 0 6px, var(--blue) 6px 12px);
+  color: var(--paper);
+  font-family: Impact, sans-serif;
+  font-size: clamp(1.2rem, 4vw, 2rem);
 }
 
 .card-front {
-  background: #232a52;
+  background: var(--paper-2);
   transform: rotateY(180deg);
-  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .card-front img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 10px;
 }
 
+/* ---------- match burst ---------- */
+.match-burst {
+  position: absolute;
+  transform: translate(-50%, -50%) rotate(-8deg);
+  font-family: Impact, "Arial Narrow Bold", sans-serif;
+  font-style: italic;
+  color: var(--ink);
+  font-size: clamp(1.1rem, 4vw, 1.9rem);
+  pointer-events: none;
+  filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.35));
+  animation: burstPop 0.7s ease forwards;
+  z-index: 5;
+  white-space: nowrap;
+}
+
+@keyframes burstPop {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.4) rotate(-8deg); }
+  30% { opacity: 1; transform: translate(-50%, -50%) scale(1.25) rotate(-8deg); }
+  70% { opacity: 1; transform: translate(-50%, -50%) scale(1.05) rotate(-8deg); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.05) translateY(-24px) rotate(-8deg); }
+}
+
+/* ---------- win overlay ---------- */
 .overlay {
   position: fixed;
   inset: 0;
@@ -207,10 +546,13 @@ button:active { transform: scale(0.97); }
   align-items: center;
   justify-content: center;
   padding: 16px;
+  z-index: 10;
 }
 
 .overlay-card {
-  background: var(--surface);
+  --ink-w: 4px;
+  background: var(--paper);
+  color: var(--ink);
   border-radius: 16px;
   padding: 28px;
   text-align: center;
@@ -218,5 +560,26 @@ button:active { transform: scale(0.97); }
   width: 100%;
 }
 
-.overlay-card h2 { margin-top: 0; }
-.overlay-card .btn-row { justify-content: center; margin-top: 16px; }
+.overlay-card h2 {
+  margin-top: 0;
+  font-family: Impact, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.overlay-card .btn-row { justify-content: center; margin-top: 16px; gap: 10px; }
+
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+@media (max-width: 480px) {
+  .badge { width: 80px; height: 80px; }
+  .title { font-size: clamp(2rem, 10vw, 3rem); }
+}

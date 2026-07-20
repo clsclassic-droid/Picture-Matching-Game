@@ -8,45 +8,98 @@
 </head>
 <body>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="roughen-a" x="-40%" y="-40%" width="180%" height="180%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="7" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="5" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <filter id="roughen-b" x="-40%" y="-40%" width="180%" height="180%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.07" numOctaves="2" seed="42" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="6" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+
 <main class="wrap">
 
+  <header class="masthead">
+    <div class="starburst"></div>
+    <span class="eyebrow ink">A Memory Adventure</span>
+    <h1 class="title">Picture Matching<span class="pop">Game!</span></h1>
+    <button id="mute-btn-start" class="mute-btn ink" title="Mute sound">🔊</button>
+  </header>
+
   <section id="start-screen" class="screen">
-    <div class="title-row">
-      <h1>🧠 Picture Matching Game</h1>
-      <button id="mute-btn-start" class="mute-btn" title="Mute sound">🔊</button>
-    </div>
 
-    <div class="option-group">
-      <h2>How many pairs?</h2>
-      <div class="btn-row">
-        <button class="difficulty-btn selected" data-pairs="8">8 pairs</button>
-        <button class="difficulty-btn" data-pairs="16">16 pairs</button>
-        <button class="difficulty-btn" data-pairs="32">32 pairs</button>
+    <section class="panel ink panel-pairs">
+      <div class="panel-label">CHOOSE YOUR CHALLENGE</div>
+      <div class="badge-row">
+        <button class="difficulty-btn badge ink selected" data-pairs="8"><span class="num">8</span><span class="lbl">PAIRS</span></button>
+        <button class="difficulty-btn badge ink" data-pairs="16"><span class="num">16</span><span class="lbl">PAIRS</span></button>
+        <button class="difficulty-btn badge ink" data-pairs="32"><span class="num">32</span><span class="lbl">PAIRS</span></button>
       </div>
-    </div>
+    </section>
 
-    <div class="option-group">
-      <h2>Card pictures</h2>
-      <div class="btn-row">
-        <button class="source-btn selected" data-source="shapes">🔷 Shapes</button>
-        <button class="source-btn" data-source="emoji">😀 Emoji</button>
-        <button class="source-btn" data-source="drive">📷 My Photos (Google Drive)</button>
+    <section class="panel ink panel-players">
+      <div class="panel-label">HOW MANY PLAYERS?</div>
+      <div class="player-toggle-row">
+        <button class="player-toggle ink selected" data-players="1">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="28" r="16" fill="none" stroke="currentColor" stroke-width="8"/><path d="M25,90 Q25,55 50,55 Q75,55 75,90" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round"/></svg>
+          1 PLAYER
+        </button>
+        <button class="player-toggle ink" data-players="2">
+          <svg viewBox="0 0 100 100"><circle cx="32" cy="26" r="13" fill="none" stroke="currentColor" stroke-width="7"/><path d="M12,86 Q12,56 32,56 Q52,56 52,86" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round"/><circle cx="70" cy="26" r="13" fill="none" stroke="currentColor" stroke-width="7"/><path d="M50,86 Q50,56 70,56 Q90,56 90,86" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round"/></svg>
+          2 PLAYERS
+        </button>
+      </div>
+    </section>
+
+    <section class="panel ink panel-source">
+      <div class="panel-label">PICK YOUR PICTURES</div>
+      <div class="tab-row">
+        <button class="source-btn tab ink" data-source="emoji">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" stroke-width="8"/><circle cx="35" cy="42" r="5" fill="currentColor"/><circle cx="65" cy="42" r="5" fill="currentColor"/><path d="M30,62 Q50,80 70,62" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round"/></svg>
+          Emoji
+        </button>
+        <button class="source-btn tab ink selected" data-source="shapes">
+          <svg viewBox="0 0 100 100"><polygon points="50,10 90,90 10,90" fill="none" stroke="currentColor" stroke-width="8"/></svg>
+          Shapes
+        </button>
+        <button class="source-btn tab ink" data-source="drive">
+          <svg viewBox="0 0 100 100"><rect x="10" y="30" width="80" height="55" rx="8" fill="none" stroke="currentColor" stroke-width="8"/><circle cx="50" cy="57" r="16" fill="none" stroke="currentColor" stroke-width="8"/><rect x="35" y="18" width="30" height="14" rx="3" fill="currentColor"/></svg>
+          My Photos (Google Drive)
+        </button>
       </div>
       <p id="drive-status" class="hint"></p>
-    </div>
+    </section>
 
-    <button id="start-btn" class="primary-btn">Start Game</button>
+    <button id="start-btn" class="cta ink">Start Game!</button>
   </section>
 
   <section id="game-screen" class="screen hidden">
-    <div class="stats-bar">
-      <span>Moves: <strong id="moves">0</strong></span>
-      <span>Time: <strong id="timer">0:00</strong></span>
-      <span>Pairs left: <strong id="pairs-left">0</strong></span>
+    <div class="stats-bar ink">
+      <span class="stat">Moves: <strong id="moves">0</strong></span>
+      <span class="stat">Time: <strong id="timer">0:00</strong></span>
+      <span class="stat">Pairs left: <strong id="pairs-left">0</strong></span>
       <div class="stats-actions">
-        <button id="mute-btn" class="mute-btn" title="Mute sound">🔊</button>
-        <button id="restart-btn">Restart</button>
-        <button id="change-settings-btn">Menu</button>
+        <button id="mute-btn" class="mute-btn ink" title="Mute sound">🔊</button>
+        <button id="restart-btn" class="ink">Restart</button>
+        <button id="change-settings-btn" class="ink">Menu</button>
+      </div>
+    </div>
+
+    <div id="scoreboard" class="scoreboard hidden">
+      <div id="player-card-0" class="player-card ink p1 active">
+        <div id="turn-flag-0" class="turn-flag ink">YOUR TURN!</div>
+        <div class="player-name">PLAYER 1</div>
+        <div class="player-score" id="player-score-0">0</div>
+        <div class="player-score-lbl">PAIRS</div>
+      </div>
+      <div class="vs-burst">VS</div>
+      <div id="player-card-1" class="player-card ink p2">
+        <div id="turn-flag-1" class="turn-flag ink hidden">YOUR TURN!</div>
+        <div class="player-name">PLAYER 2</div>
+        <div class="player-score" id="player-score-1">0</div>
+        <div class="player-score-lbl">PAIRS</div>
       </div>
     </div>
 
@@ -54,12 +107,12 @@
   </section>
 
   <div id="win-overlay" class="overlay hidden">
-    <div class="overlay-card">
-      <h2>🎉 You matched them all!</h2>
+    <div class="overlay-card ink">
+      <h2 id="win-title">🎉 You matched them all!</h2>
       <p id="win-stats"></p>
       <div class="btn-row">
-        <button id="play-again-btn" class="primary-btn">Play Again</button>
-        <button id="back-to-menu-btn">Menu</button>
+        <button id="play-again-btn" class="cta ink">Play Again</button>
+        <button id="back-to-menu-btn" class="ink">Menu</button>
       </div>
     </div>
   </div>

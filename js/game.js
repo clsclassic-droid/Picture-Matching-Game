@@ -1,11 +1,16 @@
-// Picture Matching (memory) game — supports 8 / 16 / 32 pair difficulties
-// and three card sources: built-in vector shapes (icons.js), built-in
-// emoji rendered to images (emoji.js), or the user's own photos in
-// Google Drive (see drive.js).
+// Picture Matching (memory) game — supports 8 / 16 / 32 pair difficulties,
+// 1 or 2 players, and three card sources: built-in vector shapes
+// (icons.js), built-in emoji rendered to images (emoji.js), or the user's
+// own photos in Google Drive (see drive.js).
+
+const MATCH_WORDS = ["MATCH!", "NICE!", "POW!", "ZAP!", "BOOM!"];
 
 const state = {
   difficulty: 8,
   source: "shapes",
+  playerCount: 1,
+  players: [{ score: 0 }],
+  currentPlayer: 0,
   deck: [],
   flipped: [],
   matchedCount: 0,
@@ -23,6 +28,7 @@ const el = {
   timer: document.getElementById("timer"),
   pairsLeft: document.getElementById("pairs-left"),
   winOverlay: document.getElementById("win-overlay"),
+  winTitle: document.getElementById("win-title"),
   winStats: document.getElementById("win-stats"),
   driveStatus: document.getElementById("drive-status"),
   restartBtn: document.getElementById("restart-btn"),
@@ -31,6 +37,10 @@ const el = {
   backToMenuBtn: document.getElementById("back-to-menu-btn"),
   muteBtn: document.getElementById("mute-btn"),
   muteBtnStart: document.getElementById("mute-btn-start"),
+  scoreboard: document.getElementById("scoreboard"),
+  playerCards: [document.getElementById("player-card-0"), document.getElementById("player-card-1")],
+  playerScores: [document.getElementById("player-score-0"), document.getElementById("player-score-1")],
+  turnFlags: [document.getElementById("turn-flag-0"), document.getElementById("turn-flag-1")],
 };
 
 function setMuteIcon(muted) {
@@ -52,6 +62,14 @@ document.querySelectorAll(".difficulty-btn").forEach((btn) => {
     document.querySelectorAll(".difficulty-btn").forEach((b) => b.classList.remove("selected"));
     btn.classList.add("selected");
     state.difficulty = Number(btn.dataset.pairs);
+  });
+});
+
+document.querySelectorAll(".player-toggle").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".player-toggle").forEach((b) => b.classList.remove("selected"));
+    btn.classList.add("selected");
+    state.playerCount = Number(btn.dataset.players);
   });
 });
 
@@ -111,6 +129,8 @@ async function startGame() {
   state.moves = 0;
   state.seconds = 0;
   state.lock = false;
+  state.players = Array.from({ length: state.playerCount }, () => ({ score: 0 }));
+  state.currentPlayer = 0;
 
   el.startScreen.classList.add("hidden");
   el.winOverlay.classList.add("hidden");
@@ -118,6 +138,7 @@ async function startGame() {
 
   renderBoard();
   updateStats();
+  renderScoreboard();
   startTimer();
   GameAudio.startMusic();
 }
@@ -219,7 +240,10 @@ function checkMatch() {
     second.cardEl.classList.add("matched");
     state.matchedCount += 1;
     state.flipped = [];
+    state.players[state.currentPlayer].score += 1;
     updateStats();
+    renderScoreboard();
+    spawnMatchBurst(first.cardEl, second.cardEl);
     if (state.matchedCount === state.difficulty) {
       finishGame();
     } else {
@@ -235,7 +259,42 @@ function checkMatch() {
     second.cardEl.classList.remove("flipped");
     state.flipped = [];
     state.lock = false;
+    if (state.playerCount === 2) {
+      state.currentPlayer = state.currentPlayer === 0 ? 1 : 0;
+      renderScoreboard();
+    }
   }, 800);
+}
+
+function renderScoreboard() {
+  const twoPlayer = state.playerCount === 2;
+  el.scoreboard.classList.toggle("hidden", !twoPlayer);
+  if (!twoPlayer) return;
+
+  for (let i = 0; i < 2; i++) {
+    el.playerScores[i].textContent = state.players[i].score;
+    const isActive = state.currentPlayer === i;
+    el.playerCards[i].classList.toggle("active", isActive);
+    el.turnFlags[i].classList.toggle("hidden", !isActive);
+  }
+}
+
+function spawnMatchBurst(cardElA, cardElB) {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  const boardRect = el.board.getBoundingClientRect();
+  const rectA = cardElA.getBoundingClientRect();
+  const rectB = cardElB.getBoundingClientRect();
+  const midX = ((rectA.left + rectA.right) / 2 + (rectB.left + rectB.right) / 2) / 2 - boardRect.left;
+  const midY = ((rectA.top + rectA.bottom) / 2 + (rectB.top + rectB.bottom) / 2) / 2 - boardRect.top;
+
+  const burst = document.createElement("div");
+  burst.className = "match-burst";
+  burst.textContent = MATCH_WORDS[Math.floor(Math.random() * MATCH_WORDS.length)];
+  burst.style.left = `${midX}px`;
+  burst.style.top = `${midY}px`;
+  burst.addEventListener("animationend", () => burst.remove());
+  el.board.appendChild(burst);
 }
 
 function updateStats() {
@@ -265,7 +324,20 @@ function finishGame() {
   stopTimer();
   GameAudio.stopMusic();
   GameAudio.playWin();
-  el.winStats.textContent = `${state.difficulty} pairs matched in ${state.moves} moves, ${el.timer.textContent}.`;
+
+  if (state.playerCount === 2) {
+    const [p1, p2] = state.players;
+    let result;
+    if (p1.score > p2.score) result = `Player 1 wins, ${p1.score}–${p2.score}!`;
+    else if (p2.score > p1.score) result = `Player 2 wins, ${p2.score}–${p1.score}!`;
+    else result = `It's a tie, ${p1.score}–${p2.score}!`;
+    el.winTitle.textContent = "🎉 Game Over!";
+    el.winStats.textContent = `${result} (${state.moves} moves, ${el.timer.textContent})`;
+  } else {
+    el.winTitle.textContent = "🎉 You matched them all!";
+    el.winStats.textContent = `${state.difficulty} pairs matched in ${state.moves} moves, ${el.timer.textContent}.`;
+  }
+
   el.winOverlay.classList.remove("hidden");
 }
 
