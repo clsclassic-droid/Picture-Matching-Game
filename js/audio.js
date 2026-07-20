@@ -12,19 +12,23 @@ const GameAudio = (() => {
   const NOTE_DURATION = 0.38;
 
   function ensureContext() {
-    if (ctx) return ctx;
-    ctx = new (window.AudioContext || window.webkitAudioContext)();
-    masterGain = ctx.createGain();
-    masterGain.gain.value = muted ? 0 : 1;
-    masterGain.connect(ctx.destination);
+    if (!ctx) {
+      ctx = new (window.AudioContext || window.webkitAudioContext)();
+      masterGain = ctx.createGain();
+      masterGain.gain.value = muted ? 0 : 1;
+      masterGain.connect(ctx.destination);
 
-    sfxGain = ctx.createGain();
-    sfxGain.gain.value = 0.35;
-    sfxGain.connect(masterGain);
+      sfxGain = ctx.createGain();
+      sfxGain.gain.value = 0.35;
+      sfxGain.connect(masterGain);
 
-    musicGain = ctx.createGain();
-    musicGain.gain.value = 0.05;
-    musicGain.connect(masterGain);
+      musicGain = ctx.createGain();
+      musicGain.gain.value = 0.05;
+      musicGain.connect(masterGain);
+    }
+    // Browsers sometimes create/leave the context suspended (autoplay
+    // policy) even when called from a click handler; resume defensively.
+    if (ctx.state === "suspended") ctx.resume();
     return ctx;
   }
 
@@ -47,12 +51,14 @@ const GameAudio = (() => {
 
   function playFlip() {
     if (!ctx) return;
+    if (ctx.state === "suspended") ctx.resume();
     const t = ctx.currentTime;
     tone({ freq: 520, start: t, duration: 0.09, type: "triangle", gain: 0.5 });
   }
 
   function playMatch() {
     if (!ctx) return;
+    if (ctx.state === "suspended") ctx.resume();
     const t = ctx.currentTime;
     tone({ freq: 523.25, start: t, duration: 0.16, type: "triangle", gain: 0.55 });
     tone({ freq: 783.99, start: t + 0.1, duration: 0.22, type: "triangle", gain: 0.55 });
@@ -60,12 +66,14 @@ const GameAudio = (() => {
 
   function playMismatch() {
     if (!ctx) return;
+    if (ctx.state === "suspended") ctx.resume();
     const t = ctx.currentTime;
     tone({ freq: 220, start: t, duration: 0.28, type: "sawtooth", gain: 0.3, glideTo: 130 });
   }
 
   function playWin() {
     if (!ctx) return;
+    if (ctx.state === "suspended") ctx.resume();
     const t = ctx.currentTime;
     [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
       tone({ freq, start: t + i * 0.14, duration: 0.3, type: "triangle", gain: 0.55 });

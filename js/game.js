@@ -1,15 +1,6 @@
 // Picture Matching (memory) game — supports 8 / 16 / 32 pair difficulties
-// and two card sources: built-in emoji, or the user's own photos in
-// Google Drive (see drive.js).
-
-const EMOJI_POOL = [
-  "🐶", "🐱", "🦊", "🐻", "🐼", "🐨", "🐯", "🦁",
-  "🐮", "🐷", "🐸", "🐵", "🐔", "🐧", "🐦", "🦉",
-  "🦄", "🐴", "🐝", "🦋", "🐢", "🐙", "🐬", "🐳",
-  "🍎", "🍌", "🍇", "🍉", "🍓", "🍒", "🍕", "🍔",
-  "🍩", "🍪", "🎂", "🍭", "⚽", "🏀", "🎸", "🎨",
-  "🚀", "🚗", "⭐", "🌈", "🌙", "☀️", "🔥", "❄️",
-];
+// and two card sources: built-in vector shapes (icons.js), or the user's
+// own photos in Google Drive (see drive.js).
 
 const state = {
   difficulty: 8,
@@ -99,7 +90,9 @@ async function startGame() {
       return;
     }
   } else {
-    faces = shuffle(EMOJI_POOL.slice()).slice(0, pairs).map((e) => ({ type: "emoji", value: e }));
+    faces = shuffle(Icons.allCombos())
+      .slice(0, pairs)
+      .map((c) => ({ type: "icon", shape: c.shape, color: c.color }));
   }
 
   state.deck = shuffle(
@@ -179,8 +172,8 @@ function renderBoard() {
 
     const front = document.createElement("div");
     front.className = "card-face card-front";
-    if (card.type === "emoji") {
-      front.textContent = card.value;
+    if (card.type === "icon") {
+      front.innerHTML = Icons.svgMarkup(card.shape, card.color);
     } else {
       const img = document.createElement("img");
       img.src = card.value;
