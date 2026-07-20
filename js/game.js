@@ -37,7 +37,23 @@ const el = {
   changeSettingsBtn: document.getElementById("change-settings-btn"),
   playAgainBtn: document.getElementById("play-again-btn"),
   backToMenuBtn: document.getElementById("back-to-menu-btn"),
+  muteBtn: document.getElementById("mute-btn"),
+  muteBtnStart: document.getElementById("mute-btn-start"),
 };
+
+function setMuteIcon(muted) {
+  const icon = muted ? "🔇" : "🔊";
+  el.muteBtn.textContent = icon;
+  el.muteBtnStart.textContent = icon;
+}
+
+function handleMuteClick() {
+  GameAudio.ensureContext();
+  setMuteIcon(GameAudio.toggleMute());
+}
+
+el.muteBtn.addEventListener("click", handleMuteClick);
+el.muteBtnStart.addEventListener("click", handleMuteClick);
 
 document.querySelectorAll(".difficulty-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
@@ -64,12 +80,14 @@ el.backToMenuBtn.addEventListener("click", showStartScreen);
 
 function showStartScreen() {
   stopTimer();
+  GameAudio.stopMusic();
   el.gameScreen.classList.add("hidden");
   el.winOverlay.classList.add("hidden");
   el.startScreen.classList.remove("hidden");
 }
 
 async function startGame() {
+  GameAudio.ensureContext();
   const pairs = state.difficulty;
 
   let faces;
@@ -103,6 +121,7 @@ async function startGame() {
   renderBoard();
   updateStats();
   startTimer();
+  GameAudio.startMusic();
 }
 
 async function buildDriveFaces(pairs) {
@@ -184,6 +203,7 @@ function onCardClick(card, cardEl) {
 
   cardEl.classList.add("flipped");
   state.flipped.push({ card, cardEl });
+  GameAudio.playFlip();
 
   if (state.flipped.length === 2) {
     state.moves += 1;
@@ -204,10 +224,13 @@ function checkMatch() {
     updateStats();
     if (state.matchedCount === state.difficulty) {
       finishGame();
+    } else {
+      GameAudio.playMatch();
     }
     return;
   }
 
+  GameAudio.playMismatch();
   state.lock = true;
   setTimeout(() => {
     first.cardEl.classList.remove("flipped");
@@ -242,6 +265,8 @@ function stopTimer() {
 
 function finishGame() {
   stopTimer();
+  GameAudio.stopMusic();
+  GameAudio.playWin();
   el.winStats.textContent = `${state.difficulty} pairs matched in ${state.moves} moves, ${el.timer.textContent}.`;
   el.winOverlay.classList.remove("hidden");
 }

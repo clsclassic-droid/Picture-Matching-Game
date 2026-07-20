@@ -31,6 +31,14 @@ body {
 h1 {
   text-align: center;
   font-size: clamp(1.5rem, 5vw, 2.2rem);
+  margin: 0;
+  flex: 1;
+}
+
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   margin-bottom: 24px;
 }
 
@@ -98,6 +106,12 @@ button:active { transform: scale(0.97); }
 
 .stats-actions { margin-left: auto; display: flex; gap: 8px; }
 
+.mute-btn {
+  padding: 10px 14px;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
 .board {
   --cols: 4;
   display: grid;
@@ -126,7 +140,10 @@ button:active { transform: scale(0.97); }
   transform: rotateY(180deg);
 }
 
-.card.matched .card-inner { opacity: 0.55; }
+.card.matched .card-front {
+  border-color: var(--accent-2);
+  box-shadow: 0 0 0 2px var(--accent-2);
+}
 
 .card-face {
   position: absolute;
