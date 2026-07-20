@@ -1,10 +1,11 @@
 // Picture Matching (memory) game — supports 8 / 16 / 32 pair difficulties
-// and two card sources: built-in vector shapes (icons.js), or the user's
-// own photos in Google Drive (see drive.js).
+// and three card sources: built-in vector shapes (icons.js), built-in
+// emoji rendered to images (emoji.js), or the user's own photos in
+// Google Drive (see drive.js).
 
 const state = {
   difficulty: 8,
-  source: "emoji",
+  source: "shapes",
   deck: [],
   flipped: [],
   matchedCount: 0,
@@ -89,6 +90,10 @@ async function startGame() {
       el.driveStatus.textContent = `❌ ${err.message}`;
       return;
     }
+  } else if (state.source === "emoji") {
+    faces = shuffle(Emoji.POOL.slice())
+      .slice(0, pairs)
+      .map((e) => ({ type: "image", value: Emoji.toDataURL(e) }));
   } else {
     faces = shuffle(Icons.allCombos())
       .slice(0, pairs)
