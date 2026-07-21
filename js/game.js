@@ -36,27 +36,42 @@ const el = {
   changeSettingsBtn: document.getElementById("change-settings-btn"),
   playAgainBtn: document.getElementById("play-again-btn"),
   backToMenuBtn: document.getElementById("back-to-menu-btn"),
-  muteBtn: document.getElementById("mute-btn"),
-  muteBtnStart: document.getElementById("mute-btn-start"),
+  musicMuteBtn: document.getElementById("music-mute-btn"),
+  musicMuteBtnStart: document.getElementById("music-mute-btn-start"),
+  sfxMuteBtn: document.getElementById("sfx-mute-btn"),
+  sfxMuteBtnStart: document.getElementById("sfx-mute-btn-start"),
   scoreboard: document.getElementById("scoreboard"),
   playerCards: [document.getElementById("player-card-0"), document.getElementById("player-card-1")],
   playerScores: [document.getElementById("player-score-0"), document.getElementById("player-score-1")],
   turnFlags: [document.getElementById("turn-flag-0"), document.getElementById("turn-flag-1")],
 };
 
-function setMuteIcon(muted) {
+function setMusicMuteIcon(muted) {
+  const icon = muted ? "🚫" : "🎵";
+  el.musicMuteBtn.textContent = icon;
+  el.musicMuteBtnStart.textContent = icon;
+}
+
+function setSfxMuteIcon(muted) {
   const icon = muted ? "🔇" : "🔊";
-  el.muteBtn.textContent = icon;
-  el.muteBtnStart.textContent = icon;
+  el.sfxMuteBtn.textContent = icon;
+  el.sfxMuteBtnStart.textContent = icon;
 }
 
-function handleMuteClick() {
+function handleMusicMuteClick() {
   GameAudio.ensureContext();
-  setMuteIcon(GameAudio.toggleMute());
+  setMusicMuteIcon(GameAudio.toggleMusicMute());
 }
 
-el.muteBtn.addEventListener("click", handleMuteClick);
-el.muteBtnStart.addEventListener("click", handleMuteClick);
+function handleSfxMuteClick() {
+  GameAudio.ensureContext();
+  setSfxMuteIcon(GameAudio.toggleSfxMute());
+}
+
+el.musicMuteBtn.addEventListener("click", handleMusicMuteClick);
+el.musicMuteBtnStart.addEventListener("click", handleMusicMuteClick);
+el.sfxMuteBtn.addEventListener("click", handleSfxMuteClick);
+el.sfxMuteBtnStart.addEventListener("click", handleSfxMuteClick);
 
 document.querySelectorAll(".difficulty-btn").forEach((btn) => {
   btn.addEventListener("click", () => {

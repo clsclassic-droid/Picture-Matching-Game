@@ -93,6 +93,12 @@ body::before {
   isolation: isolate;
 }
 
+.mute-group {
+  display: inline-flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
 .starburst {
   position: absolute;
   inset: -40px -10px auto -10px;

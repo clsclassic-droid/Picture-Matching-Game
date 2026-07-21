@@ -25,7 +25,10 @@
     <div class="starburst"></div>
     <span class="eyebrow ink">A Memory Adventure</span>
     <h1 class="title">Picture Matching<span class="pop">Game!</span></h1>
-    <button id="mute-btn-start" class="mute-btn ink" title="Mute sound">🔊</button>
+    <div class="mute-group">
+      <button id="music-mute-btn-start" class="mute-btn ink" title="Mute music">🎵</button>
+      <button id="sfx-mute-btn-start" class="mute-btn ink" title="Mute sound effects">🔊</button>
+    </div>
   </header>
 
   <section id="start-screen" class="screen">
@@ -91,7 +94,8 @@
       <span class="stat">Time: <strong id="timer">0:00</strong></span>
       <span class="stat">Pairs left: <strong id="pairs-left">0</strong></span>
       <div class="stats-actions">
-        <button id="mute-btn" class="mute-btn ink" title="Mute sound">🔊</button>
+        <button id="music-mute-btn" class="mute-btn ink" title="Mute music">🎵</button>
+        <button id="sfx-mute-btn" class="mute-btn ink" title="Mute sound effects">🔊</button>
         <button id="restart-btn" class="ink">Restart</button>
         <button id="change-settings-btn" class="ink">Menu</button>
       </div>

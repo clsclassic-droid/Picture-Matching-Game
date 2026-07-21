@@ -3,10 +3,14 @@
 
 const GameAudio = (() => {
   let ctx = null;
-  let masterGain, sfxGain, musicGain;
-  let muted = false;
+  let sfxGain, musicGain;
+  let sfxMuted = false;
+  let musicMuted = false;
   let musicTimer = null;
   let musicOn = false;
+
+  const SFX_BASE_GAIN = 0.35;
+  const MUSIC_BASE_GAIN = 0.05;
 
   const MUSIC_TRACKS = {
     playful: {
@@ -39,17 +43,14 @@ const GameAudio = (() => {
   function ensureContext() {
     if (!ctx) {
       ctx = new (window.AudioContext || window.webkitAudioContext)();
-      masterGain = ctx.createGain();
-      masterGain.gain.value = muted ? 0 : 1;
-      masterGain.connect(ctx.destination);
 
       sfxGain = ctx.createGain();
-      sfxGain.gain.value = 0.35;
-      sfxGain.connect(masterGain);
+      sfxGain.gain.value = sfxMuted ? 0 : SFX_BASE_GAIN;
+      sfxGain.connect(ctx.destination);
 
       musicGain = ctx.createGain();
-      musicGain.gain.value = 0.05;
-      musicGain.connect(masterGain);
+      musicGain.gain.value = musicMuted ? 0 : MUSIC_BASE_GAIN;
+      musicGain.connect(ctx.destination);
     }
     // Browsers sometimes create/leave the context suspended (autoplay
     // policy) even when called from a click handler; resume defensively.
@@ -138,14 +139,24 @@ const GameAudio = (() => {
     }
   }
 
-  function toggleMute() {
-    muted = !muted;
-    if (ctx) masterGain.gain.setTargetAtTime(muted ? 0 : 1, ctx.currentTime, 0.05);
-    return muted;
+  function toggleSfxMute() {
+    sfxMuted = !sfxMuted;
+    if (ctx) sfxGain.gain.setTargetAtTime(sfxMuted ? 0 : SFX_BASE_GAIN, ctx.currentTime, 0.05);
+    return sfxMuted;
   }
 
-  function isMuted() {
-    return muted;
+  function toggleMusicMute() {
+    musicMuted = !musicMuted;
+    if (ctx) musicGain.gain.setTargetAtTime(musicMuted ? 0 : MUSIC_BASE_GAIN, ctx.currentTime, 0.05);
+    return musicMuted;
+  }
+
+  function isSfxMuted() {
+    return sfxMuted;
+  }
+
+  function isMusicMuted() {
+    return musicMuted;
   }
 
   return {
@@ -156,7 +167,9 @@ const GameAudio = (() => {
     playWin,
     startMusic,
     stopMusic,
-    toggleMute,
-    isMuted,
+    toggleSfxMute,
+    toggleMusicMute,
+    isSfxMuted,
+    isMusicMuted,
   };
 })();
