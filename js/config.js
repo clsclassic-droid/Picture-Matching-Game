@@ -3,6 +3,6 @@
 // The Drive folder must be shared as "Anyone with the link" -> Viewer,
 // since photos are fetched publicly (no per-visitor sign-in) using this key.
 const APP_CONFIG = {
-  DRIVE_API_KEY: "",
+  DRIVE_API_KEY: "AIzaSyCX1E3z_mZBEMKzfGziHUgovl9payEY6Ug",
   DRIVE_FOLDER_ID: "1wP1_vOXLTFM6vdnjs3yYnmK6e_YAC7iE",
 };
