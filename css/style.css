@@ -95,8 +95,14 @@ body::before {
 
 .mute-group {
   display: inline-flex;
+  align-items: center;
   gap: 10px;
   margin-top: 12px;
+}
+
+.mute-group input[type="range"] {
+  width: 90px;
+  accent-color: var(--pink);
 }
 
 .starburst {

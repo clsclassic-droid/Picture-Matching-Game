@@ -40,6 +40,7 @@ const el = {
   musicMuteBtnStart: document.getElementById("music-mute-btn-start"),
   sfxMuteBtn: document.getElementById("sfx-mute-btn"),
   sfxMuteBtnStart: document.getElementById("sfx-mute-btn-start"),
+  musicVolume: document.getElementById("music-volume"),
   scoreboard: document.getElementById("scoreboard"),
   playerCards: [document.getElementById("player-card-0"), document.getElementById("player-card-1")],
   playerScores: [document.getElementById("player-score-0"), document.getElementById("player-score-1")],
@@ -73,11 +74,17 @@ el.musicMuteBtnStart.addEventListener("click", handleMusicMuteClick);
 el.sfxMuteBtn.addEventListener("click", handleSfxMuteClick);
 el.sfxMuteBtnStart.addEventListener("click", handleSfxMuteClick);
 
+el.musicVolume.addEventListener("input", () => {
+  GameAudio.setMusicVolume(Number(el.musicVolume.value) / 100);
+});
+
 document.querySelectorAll(".difficulty-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".difficulty-btn").forEach((b) => b.classList.remove("selected"));
     btn.classList.add("selected");
     state.difficulty = Number(btn.dataset.pairs);
+    GameAudio.ensureContext();
+    GameAudio.playMenuClick();
   });
 });
 
@@ -86,6 +93,8 @@ document.querySelectorAll(".player-toggle").forEach((btn) => {
     document.querySelectorAll(".player-toggle").forEach((b) => b.classList.remove("selected"));
     btn.classList.add("selected");
     state.playerCount = Number(btn.dataset.players);
+    GameAudio.ensureContext();
+    GameAudio.playMenuClick();
   });
 });
 
@@ -94,6 +103,9 @@ document.querySelectorAll(".music-btn").forEach((btn) => {
     document.querySelectorAll(".music-btn").forEach((b) => b.classList.remove("selected"));
     btn.classList.add("selected");
     state.musicTrack = btn.dataset.music;
+    GameAudio.ensureContext();
+    GameAudio.playMenuClick();
+    GameAudio.startMusic(state.musicTrack);
   });
 });
 
@@ -103,6 +115,8 @@ document.querySelectorAll(".source-btn").forEach((btn) => {
     btn.classList.add("selected");
     state.source = btn.dataset.source;
     el.driveStatus.textContent = "";
+    GameAudio.ensureContext();
+    GameAudio.playMenuClick();
   });
 });
 
@@ -114,7 +128,7 @@ el.backToMenuBtn.addEventListener("click", showStartScreen);
 
 function showStartScreen() {
   stopTimer();
-  GameAudio.stopMusic();
+  GameAudio.startMusic(state.musicTrack);
   el.gameScreen.classList.add("hidden");
   el.winOverlay.classList.add("hidden");
   el.startScreen.classList.remove("hidden");
@@ -369,3 +383,16 @@ function shuffle(arr) {
   }
   return arr;
 }
+
+// Try to start music the moment the page loads. Browsers block audio
+// autoplay until the visitor has interacted with the page at all, so if
+// this attempt is silently blocked, the very first click/tap/keypress
+// anywhere retries it (GameAudio.startMusic is a no-op if it's already
+// playing, so this never causes a double-start).
+GameAudio.startMusic(state.musicTrack);
+function unlockMusicOnFirstInteraction() {
+  GameAudio.ensureContext();
+  GameAudio.startMusic(state.musicTrack);
+}
+document.addEventListener("pointerdown", unlockMusicOnFirstInteraction, { once: true });
+document.addEventListener("keydown", unlockMusicOnFirstInteraction, { once: true });

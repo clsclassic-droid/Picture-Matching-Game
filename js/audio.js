@@ -6,10 +6,11 @@ const GameAudio = (() => {
   let sfxGain;
   let sfxMuted = false;
   let musicMuted = false;
+  let musicVolume = 0.5;
   let musicEl = null;
+  let playingTrackId = null;
 
   const SFX_BASE_GAIN = 0.35;
-  const MUSIC_BASE_VOLUME = 0.5;
 
   const MUSIC_TRACKS = {
     "cotton-toys": {
@@ -53,6 +54,13 @@ const GameAudio = (() => {
     osc.stop(start + duration + 0.05);
   }
 
+  function playMenuClick() {
+    if (!ctx) return;
+    if (ctx.state === "suspended") ctx.resume();
+    const t = ctx.currentTime;
+    tone({ freq: 660, start: t, duration: 0.07, type: "sine", gain: 0.35 });
+  }
+
   function playFlip() {
     if (!ctx) return;
     if (ctx.state === "suspended") ctx.resume();
@@ -92,18 +100,28 @@ const GameAudio = (() => {
       musicEl = new Audio();
       musicEl.loop = true;
     }
-    musicEl.volume = musicMuted ? 0 : MUSIC_BASE_VOLUME;
+    musicEl.volume = musicMuted ? 0 : musicVolume;
+
+    // Already playing this exact track — don't restart it from the top.
+    if (playingTrackId === currentTrackId && !musicEl.paused) return;
+
+    playingTrackId = currentTrackId;
     musicEl.pause();
     musicEl.src = track.src;
     musicEl.currentTime = 0;
     musicEl.play().catch(() => {
-      // Autoplay can be blocked in rare cases; music simply won't start,
-      // sound effects are unaffected.
+      // Autoplay is blocked until the visitor interacts with the page at
+      // all; the next click/keydown anywhere retries via the same call.
     });
   }
 
   function stopMusic() {
     if (musicEl) musicEl.pause();
+  }
+
+  function setMusicVolume(volume) {
+    musicVolume = Math.max(0, Math.min(1, volume));
+    if (musicEl && !musicMuted) musicEl.volume = musicVolume;
   }
 
   function toggleSfxMute() {
@@ -114,7 +132,7 @@ const GameAudio = (() => {
 
   function toggleMusicMute() {
     musicMuted = !musicMuted;
-    if (musicEl) musicEl.volume = musicMuted ? 0 : MUSIC_BASE_VOLUME;
+    if (musicEl) musicEl.volume = musicMuted ? 0 : musicVolume;
     return musicMuted;
   }
 
@@ -128,12 +146,14 @@ const GameAudio = (() => {
 
   return {
     ensureContext,
+    playMenuClick,
     playFlip,
     playMatch,
     playMismatch,
     playWin,
     startMusic,
     stopMusic,
+    setMusicVolume,
     toggleSfxMute,
     toggleMusicMute,
     isSfxMuted,
