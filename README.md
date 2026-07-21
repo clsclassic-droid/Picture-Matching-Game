@@ -24,30 +24,32 @@ Play it live once GitHub Pages is enabled (see below), or just open
 
 ## Google Drive photo mode setup
 
-The "My Photos" mode reads images directly from your Drive folder
-`Picture Matching Game/Picture` using your own Google account — no server,
-no secrets committed to the repo. To enable it:
+The "My Photos" mode reads images straight from a **publicly-shared** Drive
+folder using an API key — nobody needs to sign in, so anyone with the game
+link can play this mode. That only works because the folder itself is
+shared as "Anyone with the link → Viewer"; treat anything you put in it as
+public.
 
-1. Go to the [Google Cloud Console](https://console.cloud.google.com/) and
-   create a new project (or reuse one).
-2. **APIs & Services → Library** → enable the **Google Drive API**.
-3. **APIs & Services → OAuth consent screen**: choose **External**, fill in
-   the required fields, and under **Test users** add your own Google account
-   email. (The app stays in "Testing" mode — that's fine, only you need to
-   sign in.)
-4. **APIs & Services → Credentials → Create Credentials → OAuth client ID**:
-   - Application type: **Web application**
-   - Authorized JavaScript origins: add the GitHub Pages URL from above
-     (e.g. `https://<username>.github.io`), and `http://localhost:8080` if
-     you want to test locally.
-   - Create it, then copy the **Client ID**.
+1. **Share the folder**: open the
+   [Picture folder](https://drive.google.com/drive/folders/1wP1_vOXLTFM6vdnjs3yYnmK6e_YAC7iE)
+   in Drive → **Share** → under "General access" choose **Anyone with the
+   link**, and make sure the role is **Viewer** (not Editor) → **Done**.
+2. Go to the [Google Cloud Console](https://console.cloud.google.com/) and
+   create a project (or reuse one you own).
+3. **APIs & Services → Library** → enable the **Google Drive API**.
+4. **APIs & Services → Credentials → Create Credentials → API key**.
+   - Once created, click the key to restrict it:
+     - **API restrictions**: restrict to **Google Drive API** only.
+     - **Application restrictions → Websites**: add your GitHub Pages URL
+       (e.g. `https://<username>.github.io/*`) so the key only works from
+       your site.
+   - Copy the API key.
 5. Open [js/config.js](js/config.js) and paste it in:
    ```js
-   GOOGLE_CLIENT_ID: "YOUR_CLIENT_ID.apps.googleusercontent.com",
+   DRIVE_API_KEY: "YOUR_API_KEY",
    ```
-6. Commit and push. Upload photos into the Drive folder
-   `Picture Matching Game/Picture`, then pick "My Photos" in the game —
-   you'll be asked to sign in and grant read-only Drive access the first time.
+6. Commit and push. Upload photos into the shared Drive folder, then pick
+   "My Photos" in the game — no sign-in prompt, it just loads.
 
 You need at least as many photos in that folder as pairs you want to play
 (8 / 16 / 32).
@@ -56,8 +58,8 @@ You need at least as many photos in that folder as pairs you want to play
 
 ```
 index.html        game markup
-css/style.css      styling, card flip animation, responsive grid
-js/config.js       Google Drive Client ID + folder ID
-js/drive.js        Google sign-in + Drive file listing/fetching
-js/game.js         game logic (deck, flips, matching, timer, scoring)
+css/style.css      comic-book styling, card flip/match animations, responsive grid
+js/config.js       Drive API key + folder ID
+js/drive.js        public Drive file listing/fetching via API key
+js/game.js         game logic (deck, flips, matching, timer, scoring, 2-player turns)
 ```

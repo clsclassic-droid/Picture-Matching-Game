@@ -1,7 +1,8 @@
-// Fill in GOOGLE_CLIENT_ID after creating an OAuth Client ID in Google Cloud Console.
+// Fill in DRIVE_API_KEY after creating an API key in Google Cloud Console.
 // See README.md "Google Drive photo mode" section for step-by-step setup.
+// The Drive folder must be shared as "Anyone with the link" -> Viewer,
+// since photos are fetched publicly (no per-visitor sign-in) using this key.
 const APP_CONFIG = {
-  GOOGLE_CLIENT_ID: "525524536055-jttahdnja7qpbdm5c8on34kmde942v6t.apps.googleusercontent.com",
+  DRIVE_API_KEY: "",
   DRIVE_FOLDER_ID: "1wP1_vOXLTFM6vdnjs3yYnmK6e_YAC7iE",
-  DRIVE_SCOPE: "https://www.googleapis.com/auth/drive.readonly",
 };

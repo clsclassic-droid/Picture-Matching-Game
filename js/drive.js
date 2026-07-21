@@ -1,63 +1,38 @@
 // Google Drive integration for the "My Photos" card source.
-// Uses Google Identity Services (token client) so this works from a static
-// site with no backend. The user signs in with their own Google account and
-// grants read-only access; only files inside APP_CONFIG.DRIVE_FOLDER_ID are used.
+//
+// Reads a publicly-shared Drive folder using an API key — no per-visitor
+// Google sign-in required, so anyone with the game link can play this mode.
+// This only works because the folder is shared as "Anyone with the link"
+// -> Viewer; the API key can only ever read what's already public, it
+// can't access private files or make any changes.
 
 const Drive = (() => {
-  let tokenClient = null;
-  let accessToken = null;
-
   function isConfigured() {
-    return Boolean(APP_CONFIG.GOOGLE_CLIENT_ID);
-  }
-
-  function ensureTokenClient() {
-    if (tokenClient) return tokenClient;
-    tokenClient = google.accounts.oauth2.initTokenClient({
-      client_id: APP_CONFIG.GOOGLE_CLIENT_ID,
-      scope: APP_CONFIG.DRIVE_SCOPE,
-      callback: () => {}, // overridden per-call below
-    });
-    return tokenClient;
-  }
-
-  function signIn() {
-    return new Promise((resolve, reject) => {
-      const client = ensureTokenClient();
-      client.callback = (resp) => {
-        if (resp.error) {
-          reject(new Error(resp.error));
-          return;
-        }
-        accessToken = resp.access_token;
-        resolve(accessToken);
-      };
-      client.requestAccessToken({ prompt: accessToken ? "" : "consent" });
-    });
+    return Boolean(APP_CONFIG.DRIVE_API_KEY);
   }
 
   async function listImages(folderId) {
     const q = encodeURIComponent(
       `'${folderId}' in parents and mimeType contains 'image/' and trashed = false`
     );
-    const url = `https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)&pageSize=200`;
-    const res = await fetch(url, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
-    if (!res.ok) throw new Error(`Drive API error (${res.status})`);
+    const url = `https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)&pageSize=200&key=${APP_CONFIG.DRIVE_API_KEY}`;
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(
+        `Drive API error (${res.status}). Make sure the folder is shared as "Anyone with the link".`
+      );
+    }
     const data = await res.json();
     return data.files || [];
   }
 
   async function fetchImageObjectUrl(fileId) {
-    const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
-    const res = await fetch(url, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
+    const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${APP_CONFIG.DRIVE_API_KEY}`;
+    const res = await fetch(url);
     if (!res.ok) throw new Error(`Failed to fetch image ${fileId}`);
     const blob = await res.blob();
     return URL.createObjectURL(blob);
   }
 
-  return { isConfigured, signIn, listImages, fetchImageObjectUrl };
+  return { isConfigured, listImages, fetchImageObjectUrl };
 })();

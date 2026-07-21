@@ -147,10 +147,7 @@ async function buildDriveFaces(pairs) {
   if (!Drive.isConfigured()) {
     throw new Error("Google Drive mode isn't set up yet. See README.md.");
   }
-  el.driveStatus.textContent = "🔐 Signing in to Google...";
-  await Drive.signIn();
-
-  el.driveStatus.textContent = "📂 Loading your photos...";
+  el.driveStatus.textContent = "📂 Loading photos...";
   const files = await Drive.listImages(APP_CONFIG.DRIVE_FOLDER_ID);
 
   if (files.length < pairs) {
