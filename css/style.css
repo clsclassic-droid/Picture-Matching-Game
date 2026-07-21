@@ -278,7 +278,7 @@ body::before {
 .tab.selected { background: var(--blue); color: var(--paper); }
 .tab svg { width: 34px; height: 34px; }
 
-.hint { color: var(--paper); font-size: 0.85rem; min-height: 1.2em; margin-top: 10px; font-weight: 700; }
+.hint { color: var(--ink); font-size: 0.85rem; min-height: 1.2em; margin-top: 10px; font-weight: 700; }
 
 /* ---------- CTA & plain buttons ---------- */
 .cta {
