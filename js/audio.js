@@ -1,56 +1,34 @@
-// Lightweight sound effects + background music, synthesized with the Web
-// Audio API so the game needs zero downloaded audio assets.
+// Sound effects: synthesized with the Web Audio API (no assets needed).
+// Background music: real licensed tracks played via <audio> (see Music/).
 
 const GameAudio = (() => {
   let ctx = null;
-  let sfxGain, musicGain;
+  let sfxGain;
   let sfxMuted = false;
   let musicMuted = false;
-  let musicTimer = null;
-  let musicOn = false;
+  let musicEl = null;
 
   const SFX_BASE_GAIN = 0.35;
-  const MUSIC_BASE_GAIN = 0.05;
+  const MUSIC_BASE_VOLUME = 0.5;
 
   const MUSIC_TRACKS = {
-    playful: {
-      notes: [261.63, 329.63, 392.0, 493.88, 440.0, 392.0, 329.63, 293.66],
-      noteDuration: 0.38,
-      type: "sine",
-      gain: 0.6,
+    "cotton-toys": {
+      label: "Cotton Toys",
+      src: "Music/cotton-toys-soundroll-main-version-16753-01-17.mp3",
     },
-    chill: {
-      notes: [220.0, 261.63, 329.63, 392.0, 329.63, 261.63],
-      noteDuration: 0.58,
-      type: "sine",
-      gain: 0.5,
-    },
-    retro: {
-      notes: [261.63, 329.63, 392.0, 523.25, 392.0, 329.63, 261.63, 329.63],
-      noteDuration: 0.2,
-      type: "square",
-      gain: 0.25,
-    },
-    epic: {
-      notes: [261.63, 293.66, 329.63, 392.0, 523.25, 392.0, 329.63, 293.66],
-      noteDuration: 0.28,
-      type: "triangle",
-      gain: 0.6,
+    "pixel-drift": {
+      label: "Pixel Drift",
+      src: "Music/pixel-drift-pecan-pie-main-version-41106-02-09.mp3",
     },
   };
-  let currentTrackId = "playful";
+  let currentTrackId = "cotton-toys";
 
   function ensureContext() {
     if (!ctx) {
       ctx = new (window.AudioContext || window.webkitAudioContext)();
-
       sfxGain = ctx.createGain();
       sfxGain.gain.value = sfxMuted ? 0 : SFX_BASE_GAIN;
       sfxGain.connect(ctx.destination);
-
-      musicGain = ctx.createGain();
-      musicGain.gain.value = musicMuted ? 0 : MUSIC_BASE_GAIN;
-      musicGain.connect(ctx.destination);
     }
     // Browsers sometimes create/leave the context suspended (autoplay
     // policy) even when called from a click handler; resume defensively.
@@ -106,37 +84,26 @@ const GameAudio = (() => {
     });
   }
 
-  function scheduleMusicLoop() {
-    if (!musicOn) return;
-    const track = MUSIC_TRACKS[currentTrackId] || MUSIC_TRACKS.playful;
-    const startTime = ctx.currentTime + 0.05;
-    track.notes.forEach((freq, i) => {
-      tone({
-        freq,
-        start: startTime + i * track.noteDuration,
-        duration: track.noteDuration * 0.9,
-        type: track.type,
-        gain: track.gain,
-        dest: musicGain,
-      });
-    });
-    musicTimer = setTimeout(scheduleMusicLoop, track.notes.length * track.noteDuration * 1000);
-  }
-
   function startMusic(trackId) {
-    ensureContext();
     if (trackId && MUSIC_TRACKS[trackId]) currentTrackId = trackId;
-    if (musicOn) return;
-    musicOn = true;
-    scheduleMusicLoop();
+    const track = MUSIC_TRACKS[currentTrackId];
+
+    if (!musicEl) {
+      musicEl = new Audio();
+      musicEl.loop = true;
+    }
+    musicEl.volume = musicMuted ? 0 : MUSIC_BASE_VOLUME;
+    musicEl.pause();
+    musicEl.src = track.src;
+    musicEl.currentTime = 0;
+    musicEl.play().catch(() => {
+      // Autoplay can be blocked in rare cases; music simply won't start,
+      // sound effects are unaffected.
+    });
   }
 
   function stopMusic() {
-    musicOn = false;
-    if (musicTimer) {
-      clearTimeout(musicTimer);
-      musicTimer = null;
-    }
+    if (musicEl) musicEl.pause();
   }
 
   function toggleSfxMute() {
@@ -147,7 +114,7 @@ const GameAudio = (() => {
 
   function toggleMusicMute() {
     musicMuted = !musicMuted;
-    if (ctx) musicGain.gain.setTargetAtTime(musicMuted ? 0 : MUSIC_BASE_GAIN, ctx.currentTime, 0.05);
+    if (musicEl) musicEl.volume = musicMuted ? 0 : MUSIC_BASE_VOLUME;
     return musicMuted;
   }
 

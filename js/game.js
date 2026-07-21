@@ -8,7 +8,7 @@ const MATCH_WORDS = ["MATCH!", "NICE!", "POW!", "ZAP!", "BOOM!"];
 const state = {
   difficulty: 8,
   source: "shapes",
-  musicTrack: "playful",
+  musicTrack: "cotton-toys",
   playerCount: 1,
   players: [{ score: 0 }],
   currentPlayer: 0,
