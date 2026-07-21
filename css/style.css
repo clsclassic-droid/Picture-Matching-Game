@@ -152,6 +152,7 @@ body::before {
 .panel-pairs { transform: rotate(-1.3deg); }
 .panel-players { transform: rotate(0.8deg); }
 .panel-source { transform: rotate(-0.6deg); }
+.panel-music { transform: rotate(0.5deg); }
 
 .panel-label {
   display: inline-block;

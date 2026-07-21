@@ -8,8 +8,33 @@ const GameAudio = (() => {
   let musicTimer = null;
   let musicOn = false;
 
-  const MUSIC_NOTES = [261.63, 329.63, 392.0, 493.88, 440.0, 392.0, 329.63, 293.66];
-  const NOTE_DURATION = 0.38;
+  const MUSIC_TRACKS = {
+    playful: {
+      notes: [261.63, 329.63, 392.0, 493.88, 440.0, 392.0, 329.63, 293.66],
+      noteDuration: 0.38,
+      type: "sine",
+      gain: 0.6,
+    },
+    chill: {
+      notes: [220.0, 261.63, 329.63, 392.0, 329.63, 261.63],
+      noteDuration: 0.58,
+      type: "sine",
+      gain: 0.5,
+    },
+    retro: {
+      notes: [261.63, 329.63, 392.0, 523.25, 392.0, 329.63, 261.63, 329.63],
+      noteDuration: 0.2,
+      type: "square",
+      gain: 0.25,
+    },
+    epic: {
+      notes: [261.63, 293.66, 329.63, 392.0, 523.25, 392.0, 329.63, 293.66],
+      noteDuration: 0.28,
+      type: "triangle",
+      gain: 0.6,
+    },
+  };
+  let currentTrackId = "playful";
 
   function ensureContext() {
     if (!ctx) {
@@ -82,22 +107,24 @@ const GameAudio = (() => {
 
   function scheduleMusicLoop() {
     if (!musicOn) return;
+    const track = MUSIC_TRACKS[currentTrackId] || MUSIC_TRACKS.playful;
     const startTime = ctx.currentTime + 0.05;
-    MUSIC_NOTES.forEach((freq, i) => {
+    track.notes.forEach((freq, i) => {
       tone({
         freq,
-        start: startTime + i * NOTE_DURATION,
-        duration: NOTE_DURATION * 0.9,
-        type: "sine",
-        gain: 0.6,
+        start: startTime + i * track.noteDuration,
+        duration: track.noteDuration * 0.9,
+        type: track.type,
+        gain: track.gain,
         dest: musicGain,
       });
     });
-    musicTimer = setTimeout(scheduleMusicLoop, MUSIC_NOTES.length * NOTE_DURATION * 1000);
+    musicTimer = setTimeout(scheduleMusicLoop, track.notes.length * track.noteDuration * 1000);
   }
 
-  function startMusic() {
+  function startMusic(trackId) {
     ensureContext();
+    if (trackId && MUSIC_TRACKS[trackId]) currentTrackId = trackId;
     if (musicOn) return;
     musicOn = true;
     scheduleMusicLoop();

@@ -8,6 +8,7 @@ const MATCH_WORDS = ["MATCH!", "NICE!", "POW!", "ZAP!", "BOOM!"];
 const state = {
   difficulty: 8,
   source: "shapes",
+  musicTrack: "playful",
   playerCount: 1,
   players: [{ score: 0 }],
   currentPlayer: 0,
@@ -70,6 +71,14 @@ document.querySelectorAll(".player-toggle").forEach((btn) => {
     document.querySelectorAll(".player-toggle").forEach((b) => b.classList.remove("selected"));
     btn.classList.add("selected");
     state.playerCount = Number(btn.dataset.players);
+  });
+});
+
+document.querySelectorAll(".music-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".music-btn").forEach((b) => b.classList.remove("selected"));
+    btn.classList.add("selected");
+    state.musicTrack = btn.dataset.music;
   });
 });
 
@@ -140,7 +149,7 @@ async function startGame() {
   updateStats();
   renderScoreboard();
   startTimer();
-  GameAudio.startMusic();
+  GameAudio.startMusic(state.musicTrack);
 }
 
 async function buildDriveFaces(pairs) {
