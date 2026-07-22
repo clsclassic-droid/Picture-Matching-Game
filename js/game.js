@@ -3,7 +3,7 @@
 // (icons.js), built-in emoji rendered to images (emoji.js), or the user's
 // own photos in Google Drive (see drive.js).
 
-const MATCH_WORDS = ["MATCH!", "NICE!", "POW!", "ZAP!", "BOOM!"];
+const MATCH_WORDS = ["MATCH!", "NICE!", "POW!", "ZAP!", "BOOM!", "COOL!", "EXCELLENT!"];
 
 
 const state = {
