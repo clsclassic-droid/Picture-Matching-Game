@@ -26,13 +26,13 @@ const Drive = (() => {
     return data.files || [];
   }
 
-  async function fetchImageObjectUrl(fileId) {
-    const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${APP_CONFIG.DRIVE_API_KEY}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`Failed to fetch image ${fileId}`);
-    const blob = await res.blob();
-    return URL.createObjectURL(blob);
+  // Returns a URL usable directly as <img src> without any fetch() call.
+  // Using fetch()+alt=media causes CORS failures on GitHub Pages because
+  // Drive redirects to its CDN which doesn't include CORS headers for
+  // cross-origin JS requests. <img> tags bypass CORS entirely.
+  function getImageUrl(fileId) {
+    return `https://lh3.googleusercontent.com/d/${fileId}`;
   }
 
-  return { isConfigured, listImages, fetchImageObjectUrl };
+  return { isConfigured, listImages, getImageUrl };
 })();

@@ -196,13 +196,11 @@ async function buildDriveFaces(pairs) {
   }
 
   const chosen = shuffle(files.slice()).slice(0, pairs);
-  el.driveStatus.textContent = `⬇️ Downloading ${chosen.length} photos...`;
-  const faces = [];
-  for (const file of chosen) {
-    const src = await Drive.fetchImageObjectUrl(file.id);
-    const animeInfo = CardAnime.getAnimeInfo(file.name);
-    faces.push({ type: "image", value: src, animeInfo });
-  }
+  const faces = chosen.map((file) => ({
+    type: "image",
+    value: Drive.getImageUrl(file.id),
+    animeInfo: CardAnime.getAnimeInfo(file.name),
+  }));
   el.driveStatus.textContent = "";
   return faces;
 }
