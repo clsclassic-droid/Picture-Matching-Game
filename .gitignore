@@ -1,2 +1,5 @@
 # Local photo sync folder — not part of the game (photos live in Google Drive)
 /Picture/
+
+# Local scratch/output files unrelated to the repo
+/Pictue Anime/

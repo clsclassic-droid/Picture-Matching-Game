@@ -5,6 +5,11 @@
 
 const MATCH_WORDS = ["MATCH!", "NICE!", "POW!", "ZAP!", "BOOM!"];
 
+let mascotCutoutUrl = null;
+Mascot.getCutoutUrl().then((url) => {
+  mascotCutoutUrl = url;
+});
+
 const state = {
   difficulty: 8,
   source: "shapes",
@@ -324,10 +329,20 @@ function spawnMatchBurst(cardElA, cardElB) {
   const midY = ((rectA.top + rectA.bottom) / 2 + (rectB.top + rectB.bottom) / 2) / 2 - boardRect.top;
 
   const burst = document.createElement("div");
-  burst.className = "match-burst";
-  burst.textContent = MATCH_WORDS[Math.floor(Math.random() * MATCH_WORDS.length)];
   burst.style.left = `${midX}px`;
   burst.style.top = `${midY}px`;
+
+  if (mascotCutoutUrl) {
+    burst.className = "match-mascot";
+    const img = document.createElement("img");
+    img.src = mascotCutoutUrl;
+    img.alt = "";
+    burst.appendChild(img);
+  } else {
+    burst.className = "match-burst";
+    burst.textContent = MATCH_WORDS[Math.floor(Math.random() * MATCH_WORDS.length)];
+  }
+
   burst.addEventListener("animationend", () => burst.remove());
   el.board.appendChild(burst);
 }
