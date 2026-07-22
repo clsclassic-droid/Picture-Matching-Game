@@ -539,6 +539,18 @@ button {
   z-index: 2;
 }
 
+/* ---------- CSS card animations (matched card hover/click) ---------- */
+@keyframes card-anim-bob {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-10px); }
+}
+.card-anim-bob {
+  animation: card-anim-bob 1.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-anim-bob { animation: none; }
+}
+
 /* ---------- match burst ---------- */
 .match-burst {
   position: absolute;

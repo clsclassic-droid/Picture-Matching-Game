@@ -200,8 +200,8 @@ async function buildDriveFaces(pairs) {
   const faces = [];
   for (const file of chosen) {
     const src = await Drive.fetchImageObjectUrl(file.id);
-    const animeUrl = CardAnime.getAnimeUrl(file.name);
-    faces.push({ type: "image", value: src, animeUrl });
+    const animeInfo = CardAnime.getAnimeInfo(file.name);
+    faces.push({ type: "image", value: src, animeInfo });
   }
   el.driveStatus.textContent = "";
   return faces;
@@ -248,7 +248,7 @@ function renderBoard() {
     inner.appendChild(front);
     cardEl.appendChild(inner);
     cardEl.addEventListener("click", () => onCardClick(card, cardEl));
-    if (card.animeUrl) CardAnime.attachToCard(cardEl, card.animeUrl);
+    if (card.animeInfo) CardAnime.attachToCard(cardEl, card.animeInfo);
     el.board.appendChild(cardEl);
   });
 }
