@@ -1,6 +1,7 @@
 // Maps Drive photo base filename (no extension) → animation mp4 path.
 const ANIME_MAP = {
   "1c04f205b7b5a7fedd251a27772ea799": "assets/anime/1.mp4",
+  "1f567a3b0793accd66a171c37f00ab77": "assets/anime/2.mp4",
 };
 
 // Maps Drive photo base filename → specific CSS animation class.
